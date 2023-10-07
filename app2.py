@@ -1,4 +1,4 @@
-pip install bokeh
+
 
 import streamlit as st
 import cv2
