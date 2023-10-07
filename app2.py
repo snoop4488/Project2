@@ -3,8 +3,10 @@ import cv2
 import numpy as np
 import pytesseract
 from PIL import Image
+from bokeh.models.widgets import Button
+from bokeh.models import CustomJS
 
-st.title("Reconocimiento óptico de Caracteres")
+st.title("Asistente de Lectura")
 
 # Agregar la opción para cargar una imagen desde el sistema
 uploaded_image = st.file_uploader("Cargar una imagen", type=["jpg", "png", "jpeg"])
@@ -21,9 +23,32 @@ elif img_file_buffer is not None:
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 else:
-    st.write("Cargue una imagen o tome una foto para continuar")
+    cv2_img = None
 
-if uploaded_image is not None or img_file_buffer is not None:
+# Variable para almacenar el texto reconocido por OCR
+ocr_text = ""
+
+if cv2_img is not None:
+    # Si hay una imagen, realizar OCR y almacenar el texto
     img_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
-    text = pytesseract.image_to_string(img_rgb)
-    st.write(text)
+    ocr_text = pytesseract.image_to_string(img_rgb)
+
+# Widget para ingresar el texto a convertir en voz
+text = st.text_input("Texto", ocr_text)
+
+# Botón para convertir el texto en voz y reproducirlo
+tts_button = Button(label="Decirlo", width=100)
+
+# Función JavaScript para convertir el texto en voz
+tts_code = """
+var u = new SpeechSynthesisUtterance();
+u.text = text_input;
+u.lang = 'es-es';
+speechSynthesis.speak(u);
+"""
+
+# Vincular el evento de clic del botón con la función JavaScript
+tts_button.js_on_event("button_click", CustomJS(args={"text_input": text}, code=tts_code))
+
+# Mostrar el botón de Texto a Voz
+st.bokeh_chart(tts_button)
