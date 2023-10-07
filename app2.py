@@ -45,7 +45,17 @@ if st.button("Decirlo"):
 
         # Reproducir el audio
         st.audio(audio_data, format='audio/wav')
-        except Exception as e:
+
+
+try:
+    # Utilizar gTTS para convertir el texto en voz
+    tts = gTTS(text, lang='es')
+    audio_data = tts.get_audio_data()
+
+    # Reproducir el audio
+    st.audio(audio_data, format='audio/wav')
+except Exception as e:
     st.error(f"Error al generar el audio: {str(e)}")
+
 
 # Mostrar el botón de Texto a Voz
