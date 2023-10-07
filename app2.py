@@ -45,5 +45,7 @@ if st.button("Decirlo"):
 
         # Reproducir el audio
         st.audio(audio_data, format='audio/wav')
+        except Exception as e:
+    st.error(f"Error al generar el audio: {str(e)}")
 
 # Mostrar el botón de Texto a Voz
