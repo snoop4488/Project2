@@ -4,7 +4,7 @@ import numpy as np
 import pytesseract
 from PIL import Image
 from gtts import gTTS
-import base64
+import io
 
 st.title("Asistente de Lectura")
 
@@ -39,23 +39,15 @@ text = st.text_input("Texto", ocr_text)
 # Botón para convertir el texto en voz y reproducirlo
 if st.button("Decirlo"):
     if text:
-        # Utilizar gTTS para convertir el texto en voz
-        tts = gTTS(text, lang='es')
-        audio_data = tts.get_audio_data()
+        try:
+            # Crear un objeto gTTS con el texto y el idioma
+            tts = gTTS(text, lang='es')
 
-        # Reproducir el audio
-        st.audio(audio_data, format='audio/wav')
+            # Utilizar BytesIO para guardar el audio en memoria
+            audio_stream = io.BytesIO()
+            tts.write_to_fp(audio_stream)
 
-
-try:
-    # Utilizar gTTS para convertir el texto en voz
-    tts = gTTS(text, lang='es')
-    audio_data = tts.get_audio_data()
-
-    # Reproducir el audio
-    st.audio(audio_data, format='audio/wav')
-except Exception as e:
-    st.error(f"Error al generar el audio: {str(e)}")
-
-
-# Mostrar el botón de Texto a Voz
+            # Reproducir el audio
+            st.audio(audio_stream.getvalue(), format='audio/mpeg')
+        except Exception as e:
+            st.error(f"Error al generar el audio: {str(e)}")
