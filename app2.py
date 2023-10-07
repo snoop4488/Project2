@@ -1,12 +1,10 @@
-
-
 import streamlit as st
 import cv2
 import numpy as np
 import pytesseract
 from PIL import Image
-from bokeh.models.widgets import Button
-from bokeh.models import CustomJS
+from gtts import gTTS
+import base64
 
 st.title("Asistente de Lectura")
 
@@ -39,18 +37,13 @@ if cv2_img is not None:
 text = st.text_input("Texto", ocr_text)
 
 # Botón para convertir el texto en voz y reproducirlo
-tts_button = Button(label="Decirlo", width=100)
+if st.button("Decirlo"):
+    if text:
+        # Utilizar gTTS para convertir el texto en voz
+        tts = gTTS(text, lang='es')
+        audio_data = tts.get_audio_data()
 
-# Función JavaScript para convertir el texto en voz
-tts_code = """
-var u = new SpeechSynthesisUtterance();
-u.text = text_input;
-u.lang = 'es-es';
-speechSynthesis.speak(u);
-"""
-
-# Vincular el evento de clic del botón con la función JavaScript
-tts_button.js_on_event("button_click", CustomJS(args={"text_input": text}, code=tts_code))
+        # Reproducir el audio
+        st.audio(audio_data, format='audio/wav')
 
 # Mostrar el botón de Texto a Voz
-st.bokeh_chart(tts_button)
